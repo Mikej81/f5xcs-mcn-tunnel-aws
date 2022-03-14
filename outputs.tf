@@ -12,10 +12,11 @@ output "deployment_info" {
   value = {
     instances = [
       {
-        admin_username = var.adminUserName
-        admin_password = module.util.admin_password
-        host_mapping   = "sudo -- sh -c 'echo ${module.remotehost.aws_eip_linux_private_ip}   ${module.remotehost.aws_eip_linux_public_dns} >> /etc/hosts'"
-        connect        = "echo -n ${module.util.admin_password} | sudo openconnect -b ${module.remotehost.aws_eip_linux_public_dns} -u vpnuser --passwd-on-stdin"
+        admin_username    = var.adminUserName
+        admin_password    = module.util.admin_password
+        ssh_key_pair_name = module.aws.aws_key_pair_key_pair_key_name
+        host_mapping      = "sudo -- sh -c 'echo ${module.remotehost.aws_eip_linux_private_ip}   ${module.remotehost.aws_eip_linux_public_dns} >> /etc/hosts'"
+        connect           = "echo -n ${module.util.admin_password} | sudo openconnect -b ${module.remotehost.aws_eip_linux_public_dns} -u vpnuser --passwd-on-stdin"
       }
     ]
     deploymentId = module.util.env_prefix

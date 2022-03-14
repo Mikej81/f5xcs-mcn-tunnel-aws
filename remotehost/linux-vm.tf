@@ -56,8 +56,7 @@ resource "aws_instance" "linux-server" {
   associate_public_ip_address = var.linux_associate_public_ip_address
   source_dest_check           = false
   key_name                    = var.key_name
-  #user_data                   = file("${path.module}/../templates/user-data.sh")
-  user_data = data.template_cloudinit_config.cloud_init.rendered
+  user_data                   = data.template_cloudinit_config.cloud_init.rendered
 
   # root disk
   root_block_device {
@@ -122,6 +121,14 @@ resource "aws_security_group" "aws-linux-sg" {
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all ICMP"
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming All connections"
   }
 
   egress {
