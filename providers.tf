@@ -6,7 +6,7 @@ terraform {
     }
     volterrarm = {
       source  = "volterraedge/volterra"
-      version = "0.11.3"
+      version = "0.11.6"
     }
     http = {
       source  = "hashicorp/http"
@@ -17,8 +17,7 @@ terraform {
 provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
-  #token      = var.aws_session_token
-  region = var.aws_region
+  region     = var.aws_region
 }
 provider "volterrarm" {
   api_p12_file = var.api_p12_file

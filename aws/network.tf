@@ -38,7 +38,6 @@ resource "aws_subnet" "private-subnet" {
 # Define the internet gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.vpc.id
-  #route_table_id = aws_route_table.public-rt.id
 
   tags = {
     Name        = "${lower(var.name)}-${lower(var.environment)}-igw"

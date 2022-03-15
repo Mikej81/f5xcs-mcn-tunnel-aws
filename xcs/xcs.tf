@@ -3,7 +3,7 @@ terraform {
   required_providers {
     volterra = {
       source  = "volterraedge/volterra"
-      version = "0.11.3"
+      version = "0.11.6"
     }
   }
 }
@@ -39,59 +39,49 @@ output "credentials" {
   value = volterra_cloud_credentials.aws_cc.name
 }
 
-
-# resource "volterra_virtual_network" "inside" {
-#   name      = format("%s-inside", var.name)
-#   namespace = "system"
-
-#   site_local_inside_network = true
-# }
-# resource "volterra_virtual_network" "outside" {
-#   name      = format("%s-outside", var.name)
-#   namespace = "system"
-
-#   site_local_network = true
-# }
 resource "volterra_virtual_network" "global" {
-  name      = format("%s-global", var.name)
+  name      = format("%s-global-network", var.name)
   namespace = "system"
 
   global_network = true
 }
 
-# resource "volterra_network_connector" "snat" {
-#   name      = format("%s-connector-snat", var.name)
-#   namespace = "system"
-
-#   sli_to_global_snat {
-#     global_vn {
-#       name      = volterra_virtual_network.global.name
-#       namespace = "system"
-#       #tenant    = var.volterra_tenant
-#     }
-#     snat_config {
-#       interface_ip    = true
-#       dynamic_routing = true
-#     }
-#   }
-
-#   disable_forward_proxy = true
-# }
-
 resource "volterra_network_connector" "direct" {
-  name      = format("%s-global-direct-connect", var.name)
+  name      = format("%s-global-direct-cloud", var.name)
   namespace = "system"
 
-  sli_to_global_dr {
+  description = "Global Network Connector for Cloud Site."
+
+  slo_to_global_dr {
     global_vn {
       name      = volterra_virtual_network.global.name
       namespace = "system"
-      #tenant    = var.volterra_tenant
     }
 
   }
 
   disable_forward_proxy = true
+}
+
+resource "volterra_network_connector" "local" {
+  name      = format("%s-global-direct-fleet", var.name)
+  namespace = "system"
+
+  decription = "Global Network Connector for Local Fleet."
+
+  sli_to_global_dr {
+    global_vn {
+      name      = volterra_virtual_network.global.name
+      namespace = "system"
+    }
+
+  }
+
+  disable_forward_proxy = true
+}
+
+output "xcs_global_connector_local" {
+  value = volterra_network_connector.local.name
 }
 
 resource "volterra_aws_vpc_site" "aws_vpc_site" {
@@ -107,9 +97,14 @@ resource "volterra_aws_vpc_site" "aws_vpc_site" {
     name      = volterra_cloud_credentials.aws_cc.name
     namespace = "system"
   }
+
   vpc {
-    vpc_id = var.aws_vpc_id
+    new_vpc {
+      autogenerate = true
+      primary_ipv4 = var.vpc_cidr
+    }
   }
+
   ingress_egress_gw {
     aws_certified_hw = "aws-byol-multi-nic-voltmesh"
 
@@ -118,23 +113,40 @@ resource "volterra_aws_vpc_site" "aws_vpc_site" {
       disk_size   = "80"
 
       inside_subnet {
-        existing_subnet_id = var.aws_private_subnet_id
+        subnet_param {
+          ipv4 = var.private_subnet_cidr
+        }
       }
       outside_subnet {
-        existing_subnet_id = var.aws_public_subnet_id
+        subnet_param {
+          ipv4 = var.public_subnet_cidr
+        }
       }
     }
 
     no_inside_static_routes = true
-    # inside_static_routes {
-    #   static_route_list {
-    #     simple_static_route = var.vpc_cidr
-    #   }
-    # }
+
+    outside_static_routes {
+      static_route_list {
+        simple_static_route = "8.8.8.8/32"
+      }
+      static_route_list {
+        simple_static_route = "8.8.4.4/32"
+      }
+      static_route_list {
+        simple_static_route = "128.0.0.0/1"
+      }
+      static_route_list {
+        simple_static_route = "0.0.0.0/1"
+      }
+    }
+
+    no_network_policy = true
+    no_forward_proxy  = true
 
     global_network_list {
       global_network_connections {
-        sli_to_global_dr {
+        slo_to_global_dr {
           global_vn {
             namespace = "system"
             name      = volterra_virtual_network.global.name
@@ -142,9 +154,6 @@ resource "volterra_aws_vpc_site" "aws_vpc_site" {
         }
       }
     }
-    no_outside_static_routes = true
-    no_network_policy        = true
-    no_forward_proxy         = true
 
   }
 

@@ -8,10 +8,10 @@ variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "aws_region" {}
 variable "aws_az" {}
-variable "aws_vpc_id" {}
+#variable "aws_vpc_id" {}
 variable "vpc_cidr" {}
-variable "aws_public_subnet_id" {}
-variable "aws_private_subnet_id" {}
+#variable "aws_public_subnet_id" {}
+#variable "aws_private_subnet_id" {}
 variable "public_subnet_cidr" {}
 variable "private_subnet_cidr" {}
 variable "api_p12_file" {}
