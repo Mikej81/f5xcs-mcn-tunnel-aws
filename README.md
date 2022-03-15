@@ -1,6 +1,6 @@
-# f5xcs-mcn-tunnel-aws
+# F5 XCS MCN Tunnel for AWS (IP Obfuscation / Global Egress)
 
-Automated deployment of MCN Site for OpenConnect between CEs
+Automated deployment of Multi Cloud Networking AWS CE, with populated routes and connectors.
 
 ## Introduction
 
