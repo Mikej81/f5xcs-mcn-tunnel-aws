@@ -53,13 +53,13 @@ variable "aws_session_token" {
 variable "aws_region" {
   type        = string
   description = "REQUIRED: AWS region: us-east-1, us-west-1, ca-central-1, etc. For a list of available regions use `aws ec2 describe-regions`"
-  default     = "us-west-2"
+  default     = "ap-northeast-1"
 }
 # AWS AZ
 variable "aws_az" {
   type        = string
   description = "AWS AZ"
-  default     = "us-west-2a"
+  default     = "ap-northeast-1a"
 }
 variable "shared_credentials_files" {
   type    = string

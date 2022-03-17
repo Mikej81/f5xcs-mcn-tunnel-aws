@@ -67,7 +67,7 @@ resource "volterra_network_connector" "local" {
   name      = format("%s-global-direct-fleet", var.name)
   namespace = "system"
 
-  decription = "Global Network Connector for Local Fleet."
+  description = "Global Network Connector for Local Fleet."
 
   sli_to_global_dr {
     global_vn {
